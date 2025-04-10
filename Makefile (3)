@@ -1,0 +1,45 @@
+#vanunuraz@gmail.com
+CXX = g++
+CXXFLAGS = -std=c++11 -Wall -g
+
+#cpp files
+#the following files are common to both the main program and the test program
+COMMON_SOURCES = graph.cpp Algorithms.cpp queue.cpp unionFind.cpp
+COMMON_OBJS = $(COMMON_SOURCES:.cpp=.o)
+
+#Main progrem
+MAIN_SRCS = main.cpp
+MAIN_OBJS = $(MAIN_SRCS:.cpp=.o) $(COMMON_OBJS)
+MAIN_EXEC = main
+
+#test program
+TEST_SRCS = test.cpp
+TEST_OBJS = $(TEST_SRCS:.cpp=.o) $(COMMON_OBJS)
+TEST_EXEC = tests
+
+.PHONY: all Main test valgrind clean
+all: Main test
+
+#target for compiling .cpp files to .o files
+Main: $(MAIN_EXEC)
+	@echo "Running main executable..."
+	./$(MAIN_EXEC)
+
+$(MAIN_EXEC): $(MAIN_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+#target for testing
+test: $(TEST_EXEC)
+	@echo "Running tests..."
+	./$(TEST_EXEC)
+
+$(TEST_EXEC): $(TEST_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+#target for running tests with valgrind
+valgrind: $(MAIN_EXEC)
+	valgrind --leak-check=full --show-leak-kinds=all ./$(MAIN_EXEC)
+
+#target for clean
+clean:
+	rm -f *.o $(MAIN_EXEC) $(TEST_EXEC)
